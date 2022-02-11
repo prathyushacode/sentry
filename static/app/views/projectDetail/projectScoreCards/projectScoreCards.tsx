@@ -31,6 +31,16 @@ function ProjectScoreCards({
         selection={selection}
         isProjectStabilized={isProjectStabilized}
         hasSessions={hasSessions}
+        field="sum(session)"
+        query={query}
+      />
+
+      <ProjectStabilityScoreCard
+        organization={organization}
+        selection={selection}
+        isProjectStabilized={isProjectStabilized}
+        hasSessions={hasSessions}
+        field="count_unique(user)"
         query={query}
       />
 
@@ -54,7 +64,7 @@ function ProjectScoreCards({
 
 const CardWrapper = styled('div')`
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   grid-column-gap: ${space(2)};
 
   @media (max-width: ${p => p.theme.breakpoints[0]}) {

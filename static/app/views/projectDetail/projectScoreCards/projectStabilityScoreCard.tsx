@@ -24,6 +24,7 @@ import {
 import MissingReleasesButtons from '../missingFeatureButtons/missingReleasesButtons';
 
 type Props = AsyncComponent['props'] & {
+  field: string;
   hasSessions: boolean | null;
   isProjectStabilized: boolean;
   organization: Organization;
@@ -48,7 +49,8 @@ class ProjectStabilityScoreCard extends AsyncComponent<Props, State> {
   }
 
   getEndpoints() {
-    const {organization, selection, isProjectStabilized, hasSessions, query} = this.props;
+    const {organization, selection, isProjectStabilized, hasSessions, field, query} =
+      this.props;
 
     if (!isProjectStabilized || !hasSessions) {
       return [];
@@ -59,7 +61,7 @@ class ProjectStabilityScoreCard extends AsyncComponent<Props, State> {
     const commonQuery = {
       environment,
       project: projects[0],
-      field: 'sum(session)',
+      field,
       groupBy: 'session.status',
       interval: getDiffInMinutes(datetime) > 24 * 60 ? '1d' : '1h',
       query,
@@ -161,18 +163,20 @@ class ProjectStabilityScoreCard extends AsyncComponent<Props, State> {
   }
 
   calculateCrashFree(data?: SessionApiResponse | null) {
+    const {field} = this.props;
+
     if (!data) {
       return undefined;
     }
 
     const totalSessions = data.groups.reduce(
-      (acc, group) => acc + group.totals['sum(session)'],
+      (acc, group) => acc + group.totals[field],
       0
     );
 
     const crashedSessions = data.groups.find(
       group => group.by['session.status'] === 'crashed'
-    )?.totals['sum(session)'];
+    )?.totals[field];
 
     if (totalSessions === 0 || !defined(totalSessions) || !defined(crashedSessions)) {
       return undefined;
