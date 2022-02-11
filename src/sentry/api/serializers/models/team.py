@@ -3,6 +3,7 @@ from typing import (
     AbstractSet,
     Any,
     Iterable,
+    List,
     Mapping,
     MutableMapping,
     MutableSequence,
@@ -12,9 +13,11 @@ from typing import (
 )
 
 from django.db.models import Count
+from typing_extensions import TypedDict
 
 from sentry import roles
 from sentry.api.serializers import Serializer, register, serialize
+from sentry.api.serializers.models.user import Avatar
 from sentry.app import env
 from sentry.auth.superuser import is_active_superuser
 from sentry.models import (
@@ -83,6 +86,24 @@ def get_access_requests(item_list: Sequence[Team], user: User) -> AbstractSet[Te
             ).values_list("team", flat=True)
         )
     return frozenset()
+
+
+class _TeamSerializerResponseOptional(TypedDict, total=False):
+    externalTeams: List[str]
+    organization: Any  # TODO
+    projects: Any  # TODO
+
+
+class TeamSerializerResponse(_TeamSerializerResponseOptional):
+    id: str
+    slug: str
+    name: str
+    dateCreated: str
+    isMember: bool
+    hasAccess: bool
+    isPending: bool
+    memberCount: int
+    avatar: Avatar
 
 
 @register(Team)
@@ -173,16 +194,16 @@ class TeamSerializer(Serializer):  # type: ignore
 
     def serialize(
         self, obj: Team, attrs: Mapping[str, Any], user: Any, **kwargs: Any
-    ) -> MutableMapping[str, JSONData]:
+    ) -> TeamSerializerResponse:
         if attrs.get("avatar"):
-            avatar = {
+            avatar: Avatar = {
                 "avatarType": attrs["avatar"].get_avatar_type_display(),
                 "avatarUuid": attrs["avatar"].ident if attrs["avatar"].file_id else None,
             }
         else:
             avatar = {"avatarType": "letter_avatar", "avatarUuid": None}
 
-        result = {
+        result: TeamSerializerResponse = {
             "id": str(obj.id),
             "slug": obj.slug,
             "name": obj.name,

@@ -59,7 +59,7 @@ class _Identity(TypedDict):
     dateSynced: str
 
 
-class _UserSerializerAvatar(TypedDict):
+class Avatar(TypedDict):
     avatarType: str
     avatarUuid: Optional[str]
 
@@ -74,7 +74,7 @@ class _UserOptions(TypedDict):
 
 class UserSerializerResponseOptional(TypedDict, total=False):
     identities: List[_Identity]
-    avatar: _UserSerializerAvatar
+    avatar: Avatar
 
 
 class UserSerializerResponse(UserSerializerResponseOptional):
@@ -180,7 +180,7 @@ class UserSerializer(Serializer):  # type: ignore
             d["flags"] = {"newsletter_consent_prompt": bool(obj.flags.newsletter_consent_prompt)}
 
         if attrs.get("avatar"):
-            avatar: _UserSerializerAvatar = {
+            avatar: Avatar = {
                 "avatarType": attrs["avatar"].get_avatar_type_display(),
                 "avatarUuid": attrs["avatar"].ident if attrs["avatar"].file_id else None,
             }
