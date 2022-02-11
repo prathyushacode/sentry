@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 
 import space from 'sentry/styles/space';
-import {Organization, PageFilters} from 'sentry/types';
+import {Organization, PageFilters, SessionField} from 'sentry/types';
 
 import ProjectApdexScoreCard from './projectApdexScoreCard';
 import ProjectStabilityScoreCard from './projectStabilityScoreCard';
@@ -31,7 +31,7 @@ function ProjectScoreCards({
         selection={selection}
         isProjectStabilized={isProjectStabilized}
         hasSessions={hasSessions}
-        field="sum(session)"
+        field={SessionField.SESSIONS}
         query={query}
       />
 
@@ -40,7 +40,7 @@ function ProjectScoreCards({
         selection={selection}
         isProjectStabilized={isProjectStabilized}
         hasSessions={hasSessions}
-        field="count_unique(user)"
+        field={SessionField.USERS}
         query={query}
       />
 

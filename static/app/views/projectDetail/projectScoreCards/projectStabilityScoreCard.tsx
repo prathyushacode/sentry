@@ -11,7 +11,7 @@ import ScoreCard from 'sentry/components/scoreCard';
 import {DEFAULT_STATS_PERIOD} from 'sentry/constants';
 import {IconArrow} from 'sentry/icons';
 import {t} from 'sentry/locale';
-import {Organization, PageFilters, SessionApiResponse} from 'sentry/types';
+import {Organization, PageFilters, SessionApiResponse, SessionField} from 'sentry/types';
 import {defined, percent} from 'sentry/utils';
 import {formatAbbreviatedNumber} from 'sentry/utils/formatters';
 import {getPeriod} from 'sentry/utils/getPeriod';
@@ -24,7 +24,7 @@ import {
 import MissingReleasesButtons from '../missingFeatureButtons/missingReleasesButtons';
 
 type Props = AsyncComponent['props'] & {
-  field: string;
+  field: SessionField.SESSIONS | SessionField.USERS;
   hasSessions: boolean | null;
   isProjectStabilized: boolean;
   organization: Organization;
@@ -112,7 +112,9 @@ class ProjectStabilityScoreCard extends AsyncComponent<Props, State> {
   }
 
   get cardTitle() {
-    return t('Crash Free Sessions');
+    return this.props.field === SessionField.SESSIONS
+      ? t('Crash Free Sessions')
+      : t('Crash Free Users');
   }
 
   get cardHelp() {
