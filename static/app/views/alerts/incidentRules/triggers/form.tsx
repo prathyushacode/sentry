@@ -23,32 +23,34 @@ import {
 } from '../types';
 
 type Props = {
+  aggregate: UnsavedIncidentRule['aggregate'];
   api: Client;
+  comparisonType: AlertRuleComparisonType;
   config: Config;
-  disabled: boolean;
-  organization: Organization;
 
+  disabled: boolean;
+  fieldHelp: React.ReactNode;
+  isCritical: boolean;
+  onChange: (trigger: Trigger, changeObj: Partial<Trigger>) => void;
+  onThresholdTypeChange: (thresholdType: AlertRuleThresholdType) => void;
+  organization: Organization;
+  placeholder: string;
+  projects: Project[];
+  resolveThreshold: UnsavedIncidentRule['resolveThreshold'];
+  thresholdType: UnsavedIncidentRule['thresholdType'];
+  trigger: Trigger;
+  triggerIndex: number;
+
+  triggerLabel: React.ReactNode;
   /**
    * Map of fieldName -> errorMessage
    */
   error?: {[fieldName: string]: string};
-  projects: Project[];
-  resolveThreshold: UnsavedIncidentRule['resolveThreshold'];
-  thresholdType: UnsavedIncidentRule['thresholdType'];
-  comparisonType: AlertRuleComparisonType;
-  aggregate: UnsavedIncidentRule['aggregate'];
-  trigger: Trigger;
-  triggerIndex: number;
-  isCritical: boolean;
-  fieldHelp: React.ReactNode;
-  triggerLabel: React.ReactNode;
-  placeholder: string;
 
-  onChange: (trigger: Trigger, changeObj: Partial<Trigger>) => void;
-  onThresholdTypeChange: (thresholdType: AlertRuleThresholdType) => void;
+  hideControl?: boolean;
 };
 
-class TriggerForm extends React.PureComponent<Props> {
+class TriggerFormItem extends React.PureComponent<Props> {
   /**
    * Handler for threshold changes coming from slider or chart.
    * Needs to sync state with the form.
@@ -72,6 +74,7 @@ class TriggerForm extends React.PureComponent<Props> {
       trigger,
       isCritical,
       thresholdType,
+      hideControl,
       comparisonType,
       fieldHelp,
       triggerLabel,
@@ -91,6 +94,7 @@ class TriggerForm extends React.PureComponent<Props> {
           disableThresholdType={!isCritical}
           type={trigger.label}
           thresholdType={thresholdType}
+          hideControl={hideControl}
           threshold={trigger.alertThreshold}
           comparisonType={comparisonType}
           placeholder={placeholder}
@@ -103,7 +107,7 @@ class TriggerForm extends React.PureComponent<Props> {
 }
 
 type TriggerFormContainerProps = Omit<
-  React.ComponentProps<typeof TriggerForm>,
+  React.ComponentProps<typeof TriggerFormItem>,
   | 'onChange'
   | 'isCritical'
   | 'error'
@@ -114,12 +118,13 @@ type TriggerFormContainerProps = Omit<
   | 'triggerLabel'
   | 'placeholder'
 > & {
-  triggers: Trigger[];
-  errors?: Map<number, {[fieldName: string]: string}>;
+  hasAlertWizardV3: boolean;
   onChange: (triggerIndex: number, trigger: Trigger, changeObj: Partial<Trigger>) => void;
   onResolveThresholdChange: (
     resolveThreshold: UnsavedIncidentRule['resolveThreshold']
   ) => void;
+  triggers: Trigger[];
+  errors?: Map<number, {[fieldName: string]: string}>;
 };
 
 class TriggerFormContainer extends React.Component<TriggerFormContainerProps> {
@@ -187,6 +192,7 @@ class TriggerFormContainer extends React.Component<TriggerFormContainerProps> {
       aggregate,
       resolveThreshold,
       projects,
+      hasAlertWizardV3,
       onThresholdTypeChange,
     } = this.props;
 
@@ -205,7 +211,7 @@ class TriggerFormContainer extends React.Component<TriggerFormContainerProps> {
           // eslint-disable-next-line no-use-before-define
           const TriggerIndicator = isCritical ? CriticalIndicator : WarningIndicator;
           return (
-            <TriggerForm
+            <TriggerFormItem
               key={index}
               api={api}
               config={config}
@@ -247,7 +253,7 @@ class TriggerFormContainer extends React.Component<TriggerFormContainerProps> {
             />
           );
         })}
-        <TriggerForm
+        <TriggerFormItem
           api={api}
           config={config}
           disabled={disabled}
@@ -255,6 +261,7 @@ class TriggerFormContainer extends React.Component<TriggerFormContainerProps> {
           trigger={resolveTrigger}
           // Flip rule thresholdType to opposite
           thresholdType={+!thresholdType}
+          hideControl={hasAlertWizardV3}
           comparisonType={comparisonType}
           aggregate={aggregate}
           resolveThreshold={resolveThreshold}

@@ -17,29 +17,30 @@ import {
 } from '../types';
 
 type Props = {
-  organization: Organization;
-  projects: Project[];
-  ruleId?: string;
-  triggers: Trigger[];
-  resolveThreshold: UnsavedIncidentRule['resolveThreshold'];
-  thresholdType: UnsavedIncidentRule['thresholdType'];
-  comparisonType: AlertRuleComparisonType;
   aggregate: UnsavedIncidentRule['aggregate'];
-  currentProject: string;
   availableActions: MetricActionTemplate[] | null;
+  comparisonType: AlertRuleComparisonType;
+  currentProject: string;
   disabled: boolean;
-
   errors: Map<number, {[fieldName: string]: string}>;
-
+  hasAlertWizardV3: boolean;
   onChange: (
     triggers: Trigger[],
     triggerIndex?: number,
     changeObj?: Partial<Trigger>
   ) => void;
-  onThresholdTypeChange: (thresholdType: AlertRuleThresholdType) => void;
   onResolveThresholdChange: (
     resolveThreshold: UnsavedIncidentRule['resolveThreshold']
   ) => void;
+  onThresholdTypeChange: (thresholdType: AlertRuleThresholdType) => void;
+  organization: Organization;
+  projects: Project[];
+
+  resolveThreshold: UnsavedIncidentRule['resolveThreshold'];
+
+  thresholdType: UnsavedIncidentRule['thresholdType'];
+  triggers: Trigger[];
+  ruleId?: string;
 };
 
 /**
@@ -101,6 +102,7 @@ class Triggers extends Component<Props> {
       thresholdType,
       comparisonType,
       resolveThreshold,
+      hasAlertWizardV3,
       onThresholdTypeChange,
       onResolveThresholdChange,
     } = this.props;
@@ -120,6 +122,7 @@ class Triggers extends Component<Props> {
               resolveThreshold={resolveThreshold}
               thresholdType={thresholdType}
               comparisonType={comparisonType}
+              hasAlertWizardV3={hasAlertWizardV3}
               onChange={this.handleChangeTrigger}
               onThresholdTypeChange={onThresholdTypeChange}
               onResolveThresholdChange={onResolveThresholdChange}
