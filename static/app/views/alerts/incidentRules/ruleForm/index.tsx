@@ -65,34 +65,34 @@ type Props = {
   routes: PlainRoute[];
   rule: IncidentRule;
   userTeamIds: string[];
+  isCustomMetric?: boolean;
   ruleId?: string;
   sessionId?: string;
-  isCustomMetric?: boolean;
 } & RouteComponentProps<{orgId: string; projectId: string; ruleId?: string}, {}> & {
     onSubmitSuccess?: Form['props']['onSubmitSuccess'];
   } & AsyncComponent['props'];
 
 type State = {
-  triggers: Trigger[];
-  resolveThreshold: UnsavedIncidentRule['resolveThreshold'];
-  thresholdType: UnsavedIncidentRule['thresholdType'];
-  comparisonType: AlertRuleComparisonType;
-  comparisonDelta?: number;
-  projects: Project[];
-  triggerErrors: Map<number, {[fieldName: string]: string}>;
-
+  aggregate: string;
   // `null` means loading
   availableActions: MetricActionTemplate[] | null;
-
+  comparisonType: AlertRuleComparisonType;
   // Rule conditions form inputs
   // Needed for TriggersChart
   dataset: Dataset;
-  query: string;
-  aggregate: string;
-  timeWindow: number;
   environment: string | null;
-  uuid?: string;
+  projects: Project[];
+  query: string;
+
+  resolveThreshold: UnsavedIncidentRule['resolveThreshold'];
+
+  thresholdType: UnsavedIncidentRule['thresholdType'];
+  timeWindow: number;
+  triggerErrors: Map<number, {[fieldName: string]: string}>;
+  triggers: Trigger[];
+  comparisonDelta?: number;
   eventTypes?: EventTypes[];
+  uuid?: string;
 } & AsyncComponent['state'];
 
 const isEmpty = (str: unknown): boolean => str === '' || !defined(str);
@@ -708,8 +708,15 @@ class RuleFormContainer extends AsyncComponent<Props, State> {
       />
     );
 
+    const hasAlertWizardV3 =
+      Boolean(isCustomMetric) && organization.features.includes('alert-wizard-v3');
+
     const ruleNameOwnerForm = (hasAccess: boolean) => (
-      <RuleNameOwnerForm disabled={!hasAccess || !canEdit} project={project} />
+      <RuleNameOwnerForm
+        disabled={!hasAccess || !canEdit}
+        project={project}
+        hasAlertWizardV3={hasAlertWizardV3}
+      />
     );
 
     return (
@@ -764,6 +771,7 @@ class RuleFormContainer extends AsyncComponent<Props, State> {
                 onFilterSearch={this.handleFilterUpdate}
                 allowChangeEventTypes={isCustomMetric || dataset === Dataset.ERRORS}
                 alertType={isCustomMetric ? 'custom' : alertType}
+                hasAlertWizardV3={hasAlertWizardV3}
                 dataset={dataset}
                 timeWindow={timeWindow}
                 comparisonType={comparisonType}
@@ -776,7 +784,6 @@ class RuleFormContainer extends AsyncComponent<Props, State> {
               />
               <AlertListItem>{t('Set thresholds to trigger alert')}</AlertListItem>
               {triggerForm(hasAccess)}
-              <StyledListItem>{t('Add a rule name and team')}</StyledListItem>
               {ruleNameOwnerForm(hasAccess)}
             </List>
           </Form>
