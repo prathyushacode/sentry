@@ -16,9 +16,6 @@ class GLOBAL_PARAMS:
         type=str,
         location="path",
     )
-
-
-class SCIM_PARAMS:
     MEMBER_ID = OpenApiParameter(
         name="member_id",
         location="path",
@@ -26,3 +23,7 @@ class SCIM_PARAMS:
         type=int,
         description="The id of the member you'd like to query.",
     )
+
+
+class SCIM_PARAMS:
+    pass

@@ -1,5 +1,6 @@
 from django.db import transaction
 from django.db.models import Q
+from drf_spectacular.utils import extend_schema
 from rest_framework import serializers
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -14,6 +15,8 @@ from sentry.api.serializers import (
     serialize,
 )
 from sentry.api.serializers.rest_framework import ListField
+from sentry.apidocs.decorators import public
+from sentry.apidocs.parameters import GLOBAL_PARAMS
 from sentry.auth.superuser import is_active_superuser
 from sentry.models import (
     AuditLogEntryEvent,
@@ -79,6 +82,8 @@ class RelaxedMemberPermission(OrganizationPermission):
         return False
 
 
+@public(methods={"GET"})
+@extend_schema(tags=["Organizations"])
 class OrganizationMemberDetailsEndpoint(OrganizationEndpoint):
     permission_classes = [RelaxedMemberPermission]
 
@@ -129,6 +134,21 @@ class OrganizationMemberDetailsEndpoint(OrganizationEndpoint):
 
         return context
 
+    @extend_schema(
+        operation_id="Retrieve an Organization Member",
+        parameters=[GLOBAL_PARAMS.ORG_SLUG, GLOBAL_PARAMS.MEMBER_ID],
+        request=None,
+        responses={
+            200: OrganizationMemberWithTeamsSerializer,
+        },
+        # examples=[
+        #     # OpenApiExample(
+        #     #     "Successful response",
+        #     #     value={},  # TODO
+        #     #     status_codes=["200"],
+        #     # )
+        # ],
+    )
     def get(self, request: Request, organization, member_id) -> Response:
         """Currently only returns allowed invite roles for member invite"""
 
