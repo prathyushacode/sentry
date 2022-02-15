@@ -53,13 +53,10 @@ function ProjectScoreCards({
 }
 
 const CardWrapper = styled('div')`
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-column-gap: ${space(2)};
-
-  @media (max-width: ${p => p.theme.breakpoints[0]}) {
-    grid-template-columns: 1fr;
-    grid-template-rows: repeat(3, 1fr);
+  @media (min-width: ${p => p.theme.breakpoints[1]}) {
+    display: grid;
+    grid-column-gap: ${space(2)};
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 `;
 
