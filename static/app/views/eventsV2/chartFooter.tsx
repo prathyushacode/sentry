@@ -62,7 +62,6 @@ export default function ChartFooter({
           selected={displayMode}
           options={displayOptions}
           onChange={onDisplayChange}
-          menuWidth="170px"
         />
         {TOP_EVENT_MODES.includes(displayMode) && (
           <OptionSelector
@@ -70,7 +69,6 @@ export default function ChartFooter({
             selected={topEvents}
             options={topEventOptions}
             onChange={onTopEventsChange}
-            menuWidth="60px"
           />
         )}
         <OptionCheckboxSelector
