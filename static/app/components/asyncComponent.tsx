@@ -302,6 +302,11 @@ class AsyncComponent<
           // TODO(billy): This currently fails if this request is retried by SudoModal
           [`${stateKey}PageLinks`]: resp?.getResponseHeader('Link'),
         };
+        console.log(
+          'If you see dashboard twice before selectedDashboard, it will stack',
+          stateKey,
+          data
+        );
 
         if (initialRequest) {
           state.remainingRequests = prevState.remainingRequests! - 1;

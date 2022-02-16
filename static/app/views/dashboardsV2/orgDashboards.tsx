@@ -64,6 +64,11 @@ class OrgDashboards extends AsyncComponent<Props, State> {
     const endpoints: ReturnType<AsyncComponent['getEndpoints']> = [['dashboards', url]];
 
     if (params.dashboardId) {
+      console.log(
+        'after the first fetch for dashboard, this adds a fetch for default overview',
+        params,
+        location
+      );
       endpoints.push(['selectedDashboard', `${url}${params.dashboardId}/`]);
       trackAnalyticsEvent({
         eventKey: 'dashboards2.view',
@@ -71,6 +76,8 @@ class OrgDashboards extends AsyncComponent<Props, State> {
         organization_id: parseInt(this.props.organization.id, 10),
         dashboard_id: params.dashboardId,
       });
+    } else {
+      console.log('at first there is no params.dashboardId', params, location);
     }
 
     return endpoints;
@@ -101,6 +108,7 @@ class OrgDashboards extends AsyncComponent<Props, State> {
       return;
     }
 
+    console.log('nothing coming'); // <-- What does "one isn't going to arrive" mean?
     // If we don't have a selected dashboard, and one isn't going to arrive
     // we can redirect to the first dashboard in the list.
     const dashboardId = data.length ? data[0].id : 'default-overview';
