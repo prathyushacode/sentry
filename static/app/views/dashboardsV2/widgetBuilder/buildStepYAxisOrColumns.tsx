@@ -20,6 +20,7 @@ import {WidgetQuery, WidgetType} from '../types';
 
 import BuildStep from './buildStep';
 import {DataSet, DisplayType} from './utils';
+import YAxisSelector from './yAxisSelector';
 
 interface Props {
   dataSet: DataSet;
@@ -116,12 +117,44 @@ export function BuildStepYAxisOrColumns({
     );
   }
 
+  const explodedFields = queries[0].fields.map(field => explodeField({field}));
+  const fieldOptions = (measurementKeys: string[]) =>
+    generateFieldOptions({
+      organization,
+      tagKeys: Object.values(tags).map(({key}) => key),
+      measurementKeys,
+      spanOperationBreakdownKeys: SPAN_OP_BREAKDOWN_FIELDS,
+    });
+
+  function getFirstQueryError(key: string) {
+    if (!errors) {
+      return undefined;
+    }
+
+    return errors.find(queryError => queryError && queryError[key]);
+  }
+
   return (
     <BuildStep
       title={t('Choose your y-axis')}
       description="Description of what this means"
     >
-      WIP
+      <Measurements>
+        {({measurements}) => {
+          const measurementKeys = Object.values(measurements).map(({key}) => key);
+          const amendedFieldOptions = fieldOptions(measurementKeys);
+          return (
+            <YAxisSelector
+              displayType={displayType}
+              fields={explodedFields}
+              fieldOptions={amendedFieldOptions}
+              onChange={handleChange}
+              widgetType={widgetType}
+              errors={getFirstQueryError('fields')}
+            />
+          );
+        }}
+      </Measurements>
     </BuildStep>
   );
 }
